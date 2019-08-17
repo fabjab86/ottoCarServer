@@ -23,55 +23,48 @@ app.get('/', (req, res) => {
 })
 
 app.get('/cars', (req, res) => {
-  client.query('SELECT * FROM cars_stock', (err, result) => {
-    if (err) {
-      console.log(err)
-      if (!err.statusCode) err.statusCode = 500
-      res.status(err.statusCode).send({
-        status: err.statusCode,
-        error: err.message
-      })
-    } else {
-      res.status(200).send({
-        status: 'success',
-        data: result.rows
-      })
-    }
-  })
-})
-
-app.get('/cars/:car_id', (req, res) => {
-  const carId = req.param.car_id
-  console.log(carId)
-  const schema = Joi.object().keys({
-    carId: Joi.string().guid().required()
-  })
-
-  Joi.validate(carId, schema, (err, carId) => {
-    if (err) {
-      res.status(422).json({
-        status: 'error',
-        message: 'Invalid car id'
-      })
-    } else {
-      const queryText = 'SELECT * FROM cars_stock WHERE car_id=' + carId + ';'
-      client.query(queryText, (err, result) => {
-        if (err) {
-          console.log(err)
-          if (!err.statusCode) err.statusCode = 500
-          res.status(err.statusCode).send({
-            status: err.statusCode,
-            error: err.message
-          })
-        } else {
-          res.status(200).send({
-            status: 'success',
-            data: result.rows
-          })
-        }
-      })
-    }
-  })
+  const carId = req.query.carId
+  const noQueryFound = Object.keys(req.query).length === 0
+  const carIdIsCorrect = carId && carId !== undefined
+  if (carIdIsCorrect) {
+    const queryText = 'SELECT * FROM cars_stock WHERE car_id=' + carId
+    pool.query(queryText, (err, result) => {
+      if (err) {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        res.status(err.statusCode).send({
+          status: err.statusCode,
+          error: err.message
+        })
+      } else {
+        res.status(200).send({
+          status: 'success',
+          data: result.rows
+        })
+      }
+    })
+  } else if (noQueryFound) {
+    pool.query('SELECT * FROM cars_stock WHERE deleted=FALSE', (err, result) => {
+      if (err) {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        res.status(err.statusCode).send({
+          status: 'failed',
+          error: err.message
+        })
+      } else {
+        res.status(200).send({
+          status: 'success',
+          data: result.rows
+        })
+      }
+    })
+  } else if (carId === undefined) {
+    res.status(422).json({
+      status: 'error',
+      message: 'Invalid request'
+    })
+  }
 })
 
 app.post('/cars', (req, res) => {
@@ -91,7 +84,7 @@ app.post('/cars', (req, res) => {
       })
     } else {
       pool.query('INSERT INTO cars_stock(make, model, model_year)values($1, $2, $3)',
-        [inputData.make, inputData.model, inputData.model_year], (err, result) => {
+        [inputData.make, inputData.model, inputData.model_year], (err) => {
           if (err) {
             console.log(err)
             if (!err.statusCode) err.statusCode = 500
@@ -100,7 +93,7 @@ app.post('/cars', (req, res) => {
               error: err.message
             })
           } else {
-            res.json({
+            res.status(201).send({
               status: 'success',
               message: 'Car added'
             })
@@ -108,6 +101,94 @@ app.post('/cars', (req, res) => {
         })
     }
   })
+})
+
+app.delete('/cars', (req, res) => {
+  const carId = req.query.carId
+  const carIdIsCorrect = carId && carId !== undefined
+  const noQueryFound = Object.keys(req.query).length === 0
+  const queryString = 'UPDATE cars_stock SET deleted=TRUE, date_deleted=current_date WHERE car_id=' + carId
+  if (carIdIsCorrect) {
+    pool.query(queryString, (err) => {
+      if (err) {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        res.status(err.statusCode).send({
+          status: 'failed',
+          error: err.message
+        })
+      } else {
+        res.status(200).send({
+          status: 'success',
+          message: 'Car deleted'
+        })
+      }
+    })
+  } else if (noQueryFound) {
+    res.status(422).send({
+      status: 'failed',
+      message: 'Car Id must be provided'
+    })
+  } else if (carId === undefined) {
+    res.status(422).json({
+      status: 'error',
+      message: 'Invalid request'
+    })
+  }
+})
+
+app.put('/cars', (req, res) => {
+  const carId = req.query.carId
+  const noQueryFound = Object.keys(req.query).length === 0
+  const carIdIsCorrect = carId && carId !== undefined
+
+  const inputData = { make: req.body.make, model: req.body.model, model_year: req.body.model_year, active: req.body.active }
+  console.log(inputData)
+  if (carIdIsCorrect) {
+    const schema = Joi.object().keys({
+      make: Joi.string().required(),
+      model: Joi.string().required(),
+      model_year: Joi.number().min(4).required(),
+      active: Joi.boolean().required()
+    })
+    Joi.validate(inputData, schema, (err) => {
+      if (err) {
+        console.log(err)
+        if (!err.statusCode) err.statusCode = 500
+        res.status(err.statusCode).send({
+          status: 'failed schema',
+          error: err.message
+        })
+      } else {
+        const queryString = 'UPDATE cars_stock SET make=($1), model=($2), model_year=($3), active=($4) WHERE car_id=' + carId
+        pool.query(queryString, [inputData.make, inputData.model, inputData.model_year, inputData.active], (err) => {
+          if (err) {
+            console.log(err)
+            if (!err.statusCode) err.statusCode = 500
+            res.status(err.statusCode).send({
+              status: 'failed query',
+              error: err.message
+            })
+          } else {
+            res.status(201).send({
+              status: 'success',
+              message: 'Car details updated'
+            })
+          }
+        })
+      }
+    })
+  } else if (noQueryFound) {
+    res.status(422).send({
+      status: 'failed',
+      message: 'Car Id must be provided'
+    })
+  } else if (carId === undefined) {
+    res.status(422).json({
+      status: 'error',
+      message: 'Invalid request'
+    })
+  }
 })
 
 const client = new Client({
