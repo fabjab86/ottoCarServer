@@ -42,18 +42,19 @@ app.get('/cars', (req, res) => {
 
 app.get('/cars/:car_id', (req, res) => {
   const carId = req.param.car_id
+  console.log(carId)
   const schema = Joi.object().keys({
     carId: Joi.string().guid().required()
   })
 
-  Joi.validate(carId, schema, (err) => {
+  Joi.validate(carId, schema, (err, carId) => {
     if (err) {
       res.status(422).json({
         status: 'error',
         message: 'Invalid car id'
       })
     } else {
-      const queryText = 'SELECT * FROM cars_stock WHERE car_id=' + req.param.id + ';'
+      const queryText = 'SELECT * FROM cars_stock WHERE car_id=' + carId + ';'
       client.query(queryText, (err, result) => {
         if (err) {
           console.log(err)
@@ -65,7 +66,7 @@ app.get('/cars/:car_id', (req, res) => {
         } else {
           res.status(200).send({
             status: 'success',
-            data: result.rows,
+            data: result.rows
           })
         }
       })
