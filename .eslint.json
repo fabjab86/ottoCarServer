@@ -1,9 +1,0 @@
-
-{
-    "extends": "standard",
-    "rules": {
-        "quotes": ["warn", "double"],
-      "camelcase": [2, {"properties": "always"}],
-      "semi": [2, "always"]
-    }
-}

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "npm i && nodemon",
-    "test": "jest"
+    "test": "jest",
+    "pretest": "eslint --ignore-path .gitignore ."
   },
   "keywords": [],
   "author": "Farah Jabri",
@@ -14,7 +15,6 @@
     "@hapi/joi": "^15.1.1",
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
-    "eslint": "^6.1.0",
     "express": "^4.17.1",
     "i": "^0.3.6",
     "nodemon": "^1.19.1",
@@ -23,6 +23,16 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-standard": "^13.0.1",
+    "eslint-config-strongloop": "^2.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
     "jest": "^24.9.0"
+  },
+  "directories": {
+    "test": "tests"
   }
 }
