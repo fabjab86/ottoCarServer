@@ -7,7 +7,6 @@ const Joi = require('@hapi/joi')
 const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-const PORT = 3030
 const connectionString = process.env.CONNECTIONSTRING
 
 const pool = new Pool({
@@ -200,6 +199,7 @@ client.connect((err) => {
   console.log('Connected!')
 })
 
-app.listen(PORT, function () {
-  console.log('Server is running on PORT:', PORT)
+const serverPort = (process.env.SERVER_PORT || 5000)
+app.listen(serverPort, function () {
+  console.log('Server is running on PORT:', serverPort)
 })
