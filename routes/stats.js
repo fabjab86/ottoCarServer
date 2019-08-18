@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
 require('dotenv').config()
+const db = require('./db')
 
-router.get('/stats', (req, res) => {
-  res.send({ message: 'you made it' })
-})
+router.get('/stats', db.getAllStats)
 
 module.exports = router

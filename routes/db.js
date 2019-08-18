@@ -6,11 +6,19 @@ const db = pgp(connectionString)
 const helperFunctions = require('./helpers/helperFunctions')
 const schemaHelpers = require('./helpers/schemaHelpers')
 
-// this is incorrect
-const getCarStats = (req, res, next) => {
-  db.any('SELECT * FROM cars_stock WHERE deleted= $1', [false])
-    .then(result => helperFunctions.successStatus(res, result))
-    .catch(err => helperFunctions.failedErrorMessage(err, res))
+const getAllStats = (req, res, next) => {
+  db.tx(transaction => {
+    return transaction.batch([
+      transaction.any('SELECT active FROM cars_stock'),
+      transaction.any('SELECT request_type FROM http_requests')
+    ])
+  }).then(result => {
+    helperFunctions.allStats(result, res)
+  })
+    .catch(err => {
+      console.log(err)
+      helperFunctions.failedErrorMessage(err, res)
+    })
 }
 
 const getCars = (req, res, next) => {
@@ -116,7 +124,7 @@ const updateCarDetails = (req, res, next) => {
 }
 
 module.exports = {
-  getCarStats: getCarStats,
+  getAllStats: getAllStats,
   createNewCar: createNewCar,
   getCars: getCars,
   deleteCar: deleteCar,
