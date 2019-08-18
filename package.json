@@ -8,6 +8,9 @@
     "test": "jest",
     "pretest": "eslint --ignore-path .gitignore ."
   },
+  "engines": {
+    "node": "8.x"
+  },
   "keywords": [],
   "author": "Farah Jabri",
   "license": "ISC",

@@ -156,7 +156,7 @@ app.put('/cars', (req, res) => {
         console.log(err)
         if (!err.statusCode) err.statusCode = 500
         res.status(err.statusCode).send({
-          status: 'failed schema',
+          status: 'failed',
           error: err.message
         })
       } else {
@@ -166,7 +166,7 @@ app.put('/cars', (req, res) => {
             console.log(err)
             if (!err.statusCode) err.statusCode = 500
             res.status(err.statusCode).send({
-              status: 'failed query',
+              status: 'failed',
               error: err.message
             })
           } else {
