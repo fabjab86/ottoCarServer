@@ -6,6 +6,15 @@ const db = pgp(connectionString)
 const helperFunctions = require('./helpers/helperFunctions')
 const schemaHelpers = require('./helpers/schemaHelpers')
 
+db.connect()
+  .then((obj) => {
+    console.log('Connected')
+    obj.done()
+  })
+  .catch((error) => {
+    console.log('ERROR:', error.message)
+  })
+
 const getAllStats = (req, res, next) => {
   db.tx(transaction => {
     return transaction.batch([

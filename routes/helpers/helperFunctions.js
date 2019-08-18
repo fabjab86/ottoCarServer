@@ -79,7 +79,7 @@ const allStats = (data, res) => {
   }, [])
 
   const updateRequests = data[1].reduce((count, item) => {
-    if (item.request_type === 'UPDATE') count.push(item)
+    if (item.request_type === 'POST') count.push(item)
     return count
   }, [])
 
