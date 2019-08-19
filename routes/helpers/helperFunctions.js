@@ -10,7 +10,7 @@ const internalServerError = (err, res) => {
 const successStatus = (res, result) => {
   res.status(200).send({
     status: 'success',
-    data: result
+    data: result[0]
   })
 }
 
@@ -78,7 +78,7 @@ const allStats = (data, res) => {
     return count
   }, [])
 
-  const updateRequests = data[1].reduce((count, item) => {
+  const postRequests = data[1].reduce((count, item) => {
     if (item.request_type === 'POST') count.push(item)
     return count
   }, [])
@@ -92,7 +92,7 @@ const allStats = (data, res) => {
       getRequests: getRequests.length,
       deleteRequests: deleteRequests.length,
       putRequests: putRequests.length,
-      updateRequests: updateRequests.length
+      postRequests: postRequests.length
     }]
   })
 }
