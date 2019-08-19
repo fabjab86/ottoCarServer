@@ -1,5 +1,5 @@
 const app = require('./app.js')
-const serverPort = (process.env.SERVER_PORT || 5000)
+const serverPort = process.env.SERVER_PORT
 require('dotenv').config()
 
 app.listen(serverPort, (err) => {
