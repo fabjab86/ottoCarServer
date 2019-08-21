@@ -2,12 +2,11 @@
 
 [Test case scenario](#testcase) |
 [How to use](#howto)|
-[Test](#test) |
-[Code Requirements](#reqs)|
-[Sample Views](#sample) <br>
+[Code Requirements](#reqs) <br>
 
 ### Introduction  
 This is a RESTFUL API web service built with node, using a Postgres database that is hosted on aws.  
+Hosted on [Heroku](https://otto-car-server.herokuapp.com/) 
 
 ### <a name="testcase"></a>Test Case Scenario :
 
@@ -21,15 +20,43 @@ This is a RESTFUL API web service built with node, using a Postgres database tha
 **Case 1** Can get all stats for cars and all successful HTTP calls    
 
 ### <a name="howto"></a>How to use :
-#### Requirement  
-_Step 1_  
-`git clone git@github.com:fabjab86/ottoCarServer.git`  
-_Step 2_  
+> _Step 1_  
+`git clone git@github.com:fabjab86/ottoCarServer.git`    
+You will need to have a database hosted on eg aws/firebase or a local database to connect to.
+
+> Postgres commands to create the tables
+```
+CREATE TABLE cars_stock (
+car_id uuid NOT NULL DEFAULT uuid_generate_v4 (),
+date_added DATE NOT NULL DEFAULT CURRENT_DATE,
+make VARCHAR (50) NOT NULL,
+model VARCHAR (50) NOT NULL,
+model_year SMALLINT NOT NULL,
+active BOOL NOT NULL DEFAULT 'no',
+deleted BOOL NOT NULL DEFAULT 'no',
+date_deleted DATE NOT NULL,
+PRIMARY KEY (car_id)
+);
+```
+
+```
+CREATE TABLE cars_stock (
+car_id uuid DEFAULT uuid_generate_v1(),
+date_added DATE NOT NULL DEFAULT CURRENT_DATE,
+make VARCHAR (50) NOT NULL,
+model VARCHAR (50) NOT NULL,
+model_year SMALLINT NOT NULL,
+active BOOL NOT NULL DEFAULT 'no',
+deleted BOOL NOT NULL DEFAULT 'no',
+date_deleted DATE NOT NULL,
+PRIMARY KEY (car_id)
+);
+```
+>_Step 2_  
 From the command line type `npm start`  
-_Step 3_
+
+>_Step 3_  
 You can interact with the server via postman or the client on [otto-car-client](https://github.com/fabjab86/otto-car-client)
-### <a name="test"></a>How to test :
-Regretfully there are no tests at the moment.  
 
 ### <a name="reqs"></a>Code Requirement :
 
@@ -51,8 +78,5 @@ Total number of cars added
 Total number of active cars and inactive cars
 Active number of HTTP requests sent to the server, classified by HTTP method (eg: 3 GET requests, 4 POST requests, 5 PUT requests)
 
-
-
-### <a name="sample"></a>Sample Views :
 
 
